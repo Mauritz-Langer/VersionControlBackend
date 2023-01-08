@@ -13,6 +13,9 @@ public class File {
     private boolean locked;
     private String logPassword;
 
+    public File() {
+    }
+
     public File(String name, String author, LocalDateTime createdAt, List<FileVersion> versions, int versionCount, boolean locked, String logPassword) {
         this.name = name;
         this.author = author;

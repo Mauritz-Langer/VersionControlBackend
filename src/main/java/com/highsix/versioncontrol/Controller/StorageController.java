@@ -14,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@CrossOrigin
 @RestController
+@RequestMapping("/api")
 public class StorageController {
 
     private final Logger log = LoggerFactory.getLogger(StorageController.class);
@@ -24,9 +26,13 @@ public class StorageController {
     private FirebaseStorage firebaseStorage;
 
     @PostMapping("addFile")
-    public TextFile addFile(@RequestBody TextFile textFile) throws IOException {
+    public TextFile addFile(@RequestBody TextFile textFile) {
         log.info("REST request to upload file");
-        firebaseStorage.uploadFile(textFile);
+        try {
+            firebaseStorage.uploadFile(textFile);
+        } catch (Exception e) {
+            return null;
+        }
         return textFile;
     }
 

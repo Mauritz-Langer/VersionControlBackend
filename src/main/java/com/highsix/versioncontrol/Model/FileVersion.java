@@ -6,12 +6,12 @@ public class FileVersion {
 
     private int versionId;
     private String fileContent;
-    private LocalDateTime lastUpdatedAt;
+    private String lastUpdatedAt;
 
     public FileVersion() {
     }
 
-    public FileVersion(int versionId, String fileContent, LocalDateTime lastUpdatedAt) {
+    public FileVersion(int versionId, String fileContent, String lastUpdatedAt) {
         this.versionId = versionId;
         this.fileContent = fileContent;
         this.lastUpdatedAt = lastUpdatedAt;
@@ -33,11 +33,11 @@ public class FileVersion {
         this.fileContent = fileContent;
     }
 
-    public LocalDateTime getLastUpdatedAt() {
+    public String getLastUpdatedAt() {
         return lastUpdatedAt;
     }
 
-    public void setLastUpdatedAt(LocalDateTime lastUpdatedAt) {
+    public void setLastUpdatedAt(String lastUpdatedAt) {
         this.lastUpdatedAt = lastUpdatedAt;
     }
 }

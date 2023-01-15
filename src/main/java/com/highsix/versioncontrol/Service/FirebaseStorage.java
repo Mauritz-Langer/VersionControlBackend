@@ -3,12 +3,15 @@ package com.highsix.versioncontrol.Service;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
+import com.highsix.versioncontrol.Model.FileVersion;
 import com.highsix.versioncontrol.Model.TextFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
@@ -41,29 +44,33 @@ public class FirebaseStorage {
     }
 
 
-    public String[] uploadFile(TextFile textFile) throws IOException {
-        /*log.debug("bucket name====" + bucketName);
-        File file = convertMultiPartToFile(multipartFile);
-        Path filePath = file.toPath();
-        String objectName = generateFileName(multipartFile);
+    public void uploadFile(TextFile textFile) throws Exception {
+        if (!Arrays.stream(downloadAllFiles()).anyMatch(e -> e.getName().equals(textFile.getName()))){
+            log.debug("bucket name====" + bucketName);
+            for (FileVersion version: textFile.getVersions()) {
+                String objectName = generateFileName(textFile, version);
 
+                Map<String, String> metadata = new HashMap<>();
+                String time = LocalDateTime.now().toString();
+                metadata.put("createdAt", time);
+                metadata.put("lastUpdatedAt", time);
+                metadata.put("versionId", String.valueOf(version.getVersionId()));
 
-        Map<String, String> metadata = new HashMap<>();
-        //metadata.put("author", author);
-        metadata.put("createdAt", LocalDateTime.now().toString());
+                Storage storage = storageOptions.getService();
 
-        Storage storage = storageOptions.getService();
+                BlobId blobId = BlobId.of(bucketName, objectName);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setMetadata(metadata).build();
 
-        BlobId blobId = BlobId.of(bucketName, objectName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setMetadata(metadata).build();
+                Blob blob = storage.create(blobInfo, version.getFileContent().getBytes());
 
-        Blob blob = storage.create(blobInfo, Files.readAllBytes(filePath));
+                log.info("File uploaded to bucket " + bucketName + " as " + objectName);
+            }
+        } else {
+            log.error("Filename already exists");
+            throw new Exception("Filename already exists");
+        }
 
-        log.info("File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
-        return new String[]{"fileUrl", objectName};*/
-        return null;
     }
-
 
     public TextFile[] downloadAllFiles() {
         Storage storage = storageOptions.getService();
@@ -78,13 +85,27 @@ public class FirebaseStorage {
             String fileName = b.getName();
             String fileContent = new String(fileBytes);
             Map<String, String> metadata = b.getMetadata();
-            files.add(new TextFile(
-                    fileContent,
-                    fileName,
-                    metadata.get("author"),
-                    metadata.get("createdAt")
-            ));
-
+            List<FileVersion> versions = new ArrayList<>();
+            try {
+                TextFile file = files.stream().filter(e -> e.getName().equals(fileName)).findFirst().get();
+                FileVersion latestVersion = getLatestFileVersion(file);
+                file.getVersions().add(new FileVersion(latestVersion.getVersionId()+1, fileContent, metadata.get("lastUpdatedAt")));
+            } catch (Exception e){
+                versions.add(new FileVersion(
+                        Integer.parseInt(metadata.get("versionId")),
+                        fileContent,
+                        metadata.get("lastUpdatedAt")
+                ));
+                files.add(
+                        new TextFile(
+                                fileName.split("-")[0],
+                                metadata.get("createdAt"),
+                                versions,
+                                1,
+                                false
+                        )
+                );
+            }
         }
         return files.toArray(new TextFile[files.size()]);
 
@@ -101,8 +122,19 @@ public class FirebaseStorage {
         return convertedFile;
     }
 
-    private String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + Objects.requireNonNull(multiPart.getOriginalFilename()).replace(" ", "_");
+    private String generateFileName(TextFile textFile, FileVersion version) {
+        return Objects.requireNonNull(textFile.getName()).replace(" ", "_") + "-" + version.getVersionId();
+    }
+
+
+    public FileVersion getLatestFileVersion(TextFile textFile){
+        int maxIndex = 0;
+        for (int k = 0; k < textFile.getVersions().size(); k++) {
+            if (textFile.getVersions().get(k).getVersionId() > maxIndex) {
+                maxIndex = textFile.getVersions().get(k).getVersionId();
+            }
+        }
+        return textFile.getVersions().get(maxIndex);
     }
 
 

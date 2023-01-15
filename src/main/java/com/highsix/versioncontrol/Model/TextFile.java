@@ -6,23 +6,20 @@ import java.util.List;
 public class TextFile {
 
     private String name;
-    private String author;
     private String createdAt;
     private List<FileVersion> versions;
     private int versionCount;
     private boolean locked;
-    private String logPassword;
-    private String content;
 
     public TextFile() {
     }
 
-    public TextFile(String content, String name, String author, String createdAt) {
-        this.content = content;
+    public TextFile(String name, String createdAt, List<FileVersion> versions, int versionCount, boolean locked) {
         this.name = name;
-        this.author = author;
         this.createdAt = createdAt;
-
+        this.versions = versions;
+        this.versionCount = versionCount;
+        this.locked = locked;
     }
 
     public String getName() {
@@ -31,14 +28,6 @@ public class TextFile {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public String getCreatedAt() {
@@ -71,21 +60,5 @@ public class TextFile {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
-    }
-
-    public String getLogPassword() {
-        return logPassword;
-    }
-
-    public void setLogPassword(String logPassword) {
-        this.logPassword = logPassword;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }

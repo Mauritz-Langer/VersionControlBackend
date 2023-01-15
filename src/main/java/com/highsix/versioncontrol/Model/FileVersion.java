@@ -4,41 +4,33 @@ import java.time.LocalDateTime;
 
 public class FileVersion {
 
-    private int version;
-    private byte[] fileContent;
-
-    private String lastEditedBy;
+    private int versionId;
+    private String fileContent;
     private LocalDateTime lastUpdatedAt;
 
-    public FileVersion(int version, byte[] fileContent, String lastEditedBy, LocalDateTime lastUpdatedAt) {
-        this.version = version;
+    public FileVersion() {
+    }
+
+    public FileVersion(int versionId, String fileContent, LocalDateTime lastUpdatedAt) {
+        this.versionId = versionId;
         this.fileContent = fileContent;
-        this.lastEditedBy = lastEditedBy;
         this.lastUpdatedAt = lastUpdatedAt;
     }
 
-    public int getVersion() {
-        return version;
+    public int getVersionId() {
+        return versionId;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setVersionId(int versionId) {
+        this.versionId = versionId;
     }
 
-    public byte[] getFileContent() {
+    public String getFileContent() {
         return fileContent;
     }
 
-    public void setFileContent(byte[] fileContent) {
+    public void setFileContent(String fileContent) {
         this.fileContent = fileContent;
-    }
-
-    public String getLastEditedBy() {
-        return lastEditedBy;
-    }
-
-    public void setLastEditedBy(String lastEditedBy) {
-        this.lastEditedBy = lastEditedBy;
     }
 
     public LocalDateTime getLastUpdatedAt() {

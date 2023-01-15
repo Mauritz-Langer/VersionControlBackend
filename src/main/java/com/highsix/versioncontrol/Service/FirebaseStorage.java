@@ -41,15 +41,15 @@ public class FirebaseStorage {
     }
 
 
-    public String[] uploadFile(MultipartFile multipartFile, String author) throws IOException {
-        log.debug("bucket name====" + bucketName);
+    public String[] uploadFile(TextFile textFile) throws IOException {
+        /*log.debug("bucket name====" + bucketName);
         File file = convertMultiPartToFile(multipartFile);
         Path filePath = file.toPath();
         String objectName = generateFileName(multipartFile);
 
 
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("author", author);
+        //metadata.put("author", author);
         metadata.put("createdAt", LocalDateTime.now().toString());
 
         Storage storage = storageOptions.getService();
@@ -60,7 +60,8 @@ public class FirebaseStorage {
         Blob blob = storage.create(blobInfo, Files.readAllBytes(filePath));
 
         log.info("File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
-        return new String[]{"fileUrl", objectName};
+        return new String[]{"fileUrl", objectName};*/
+        return null;
     }
 
 

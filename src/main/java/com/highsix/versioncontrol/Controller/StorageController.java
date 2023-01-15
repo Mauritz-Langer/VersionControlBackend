@@ -24,10 +24,10 @@ public class StorageController {
     private FirebaseStorage firebaseStorage;
 
     @PostMapping("addFile")
-    public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file, @RequestParam("author") String author) throws IOException {
+    public TextFile addFile(@RequestBody TextFile textFile) throws IOException {
         log.info("REST request to upload file");
-        firebaseStorage.uploadFile(file, author);
-        return new ResponseEntity<>("Successfully Uploaded!", null, HttpStatus.OK);
+        firebaseStorage.uploadFile(textFile);
+        return textFile;
     }
 
 
@@ -37,36 +37,24 @@ public class StorageController {
     }
 
 
-    @PostMapping("addVersion")
-    public void addVersion(@RequestBody TextFile file) {
-
-    }
-
-    @GetMapping("getFileReadOnly")
-    public TextFile getFileReadOnly(@RequestParam("id") int fileId) {
-        return new TextFile();
-    }
-
-    @GetMapping("getFileWithLock")
-    public TextFile getFileWithLock(@RequestParam("id") int fileId, @RequestParam("password") String password) {
+    @PostMapping("addVersionAndUnlockFile")
+    public TextFile addVersionAndUnlockFile(@RequestBody TextFile file, @RequestParam("versionContent") String versionContent) {
         return new TextFile();
     }
 
     @PostMapping("lockFile")
-    public void lockFile(@RequestBody TextFile file) {
+    public TextFile lockFile(@RequestBody TextFile file) {
+        return new TextFile();
     }
 
     @PostMapping("unlockFile")
-    public void unlockFile(@RequestBody TextFile file) {
+    public TextFile unlockFile(@RequestBody TextFile file) {
+        return new TextFile();
     }
 
-    @PostMapping("resetFileToFormerVersion")
-    public void resetFileToFormerVersion(@RequestBody TextFile file, @RequestParam("version") int versionId) {
-    }
-
-    @PostMapping("compareFiles")
-    public void compareFiles(@RequestBody FileVersion[] filesToCompare) {
-
+    @PostMapping("resetFileToFormerVersion/{version}")
+    public TextFile resetFileToFormerVersion(@RequestBody TextFile file, @PathVariable("version") int versionId) {
+        return new TextFile();
     }
 
 }

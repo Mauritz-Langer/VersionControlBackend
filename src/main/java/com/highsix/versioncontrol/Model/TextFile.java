@@ -3,27 +3,26 @@ package com.highsix.versioncontrol.Model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class File {
+public class TextFile {
 
     private String name;
     private String author;
-    private LocalDateTime createdAt;
+    private String createdAt;
     private List<FileVersion> versions;
     private int versionCount;
     private boolean locked;
     private String logPassword;
+    private String content;
 
-    public File() {
+    public TextFile() {
     }
 
-    public File(String name, String author, LocalDateTime createdAt, List<FileVersion> versions, int versionCount, boolean locked, String logPassword) {
+    public TextFile(String content, String name, String author, String createdAt) {
+        this.content = content;
         this.name = name;
         this.author = author;
         this.createdAt = createdAt;
-        this.versions = versions;
-        this.versionCount = versionCount;
-        this.locked = locked;
-        this.logPassword = logPassword;
+
     }
 
     public String getName() {
@@ -42,11 +41,11 @@ public class File {
         this.author = author;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -80,5 +79,13 @@ public class File {
 
     public void setLogPassword(String logPassword) {
         this.logPassword = logPassword;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

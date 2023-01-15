@@ -1,6 +1,6 @@
 package com.highsix.versioncontrol.Controller;
 
-import com.highsix.versioncontrol.Model.File;
+import com.highsix.versioncontrol.Model.TextFile;
 import com.highsix.versioncontrol.Model.FileVersion;
 import com.highsix.versioncontrol.Service.FirebaseStorage;
 import org.slf4j.Logger;
@@ -24,44 +24,44 @@ public class StorageController {
     private FirebaseStorage firebaseStorage;
 
     @PostMapping("addFile")
-    public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<String> addFile(@RequestParam("file") MultipartFile file, @RequestParam("author") String author) throws IOException {
         log.info("REST request to upload file");
-        firebaseStorage.uploadFile(file);
+        firebaseStorage.uploadFile(file, author);
         return new ResponseEntity<>("Successfully Uploaded!", null, HttpStatus.OK);
     }
 
-    /*
+
     @GetMapping("getAllFiles")
-    public File[] getAllFiles() {
+    public TextFile[] getAllFiles() {
         return firebaseStorage.downloadAllFiles();
-    }*/
+    }
 
 
     @PostMapping("addVersion")
-    public void addVersion(@RequestBody File file) {
+    public void addVersion(@RequestBody TextFile file) {
 
     }
 
     @GetMapping("getFileReadOnly")
-    public File getFileReadOnly(@RequestParam("id") int fileId) {
-        return new File();
+    public TextFile getFileReadOnly(@RequestParam("id") int fileId) {
+        return new TextFile();
     }
 
     @GetMapping("getFileWithLock")
-    public File getFileWithLock(@RequestParam("id") int fileId, @RequestParam("password") String password) {
-        return new File();
+    public TextFile getFileWithLock(@RequestParam("id") int fileId, @RequestParam("password") String password) {
+        return new TextFile();
     }
 
     @PostMapping("lockFile")
-    public void lockFile(@RequestBody File file) {
+    public void lockFile(@RequestBody TextFile file) {
     }
 
     @PostMapping("unlockFile")
-    public void unlockFile(@RequestBody File file) {
+    public void unlockFile(@RequestBody TextFile file) {
     }
 
     @PostMapping("resetFileToFormerVersion")
-    public void resetFileToFormerVersion(@RequestBody File file, @RequestParam("version") int versionId) {
+    public void resetFileToFormerVersion(@RequestBody TextFile file, @RequestParam("version") int versionId) {
     }
 
     @PostMapping("compareFiles")

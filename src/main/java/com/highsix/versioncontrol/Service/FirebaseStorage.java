@@ -1,7 +1,9 @@
 package com.highsix.versioncontrol.Service;
 
+import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
+import com.highsix.versioncontrol.Model.TextFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,8 +14,8 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
@@ -36,25 +38,55 @@ public class FirebaseStorage {
                 .setCredentials(GoogleCredentials.fromStream
                         (serviceAccount))
                 .build();
-
-
     }
 
 
-    public String[] uploadFile(MultipartFile multipartFile) throws IOException {
+    public String[] uploadFile(MultipartFile multipartFile, String author) throws IOException {
         log.debug("bucket name====" + bucketName);
         File file = convertMultiPartToFile(multipartFile);
         Path filePath = file.toPath();
         String objectName = generateFileName(multipartFile);
 
+
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("author", author);
+        metadata.put("createdAt", LocalDateTime.now().toString());
+
         Storage storage = storageOptions.getService();
 
         BlobId blobId = BlobId.of(bucketName, objectName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setMetadata(metadata).build();
+
         Blob blob = storage.create(blobInfo, Files.readAllBytes(filePath));
 
         log.info("File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
         return new String[]{"fileUrl", objectName};
+    }
+
+
+    public TextFile[] downloadAllFiles() {
+        Storage storage = storageOptions.getService();
+        List<TextFile> files = new ArrayList<>();
+        Bucket bucket = storage.get(bucketName);
+        // List all files in the directory
+        Page<Blob> blobs = bucket.list();
+
+        for (Blob b : blobs.iterateAll()) {
+            // Download each file
+            byte[] fileBytes = b.getContent();
+            String fileName = b.getName();
+            String fileContent = new String(fileBytes);
+            Map<String, String> metadata = b.getMetadata();
+            files.add(new TextFile(
+                    fileContent,
+                    fileName,
+                    metadata.get("author"),
+                    metadata.get("createdAt")
+            ));
+
+        }
+        return files.toArray(new TextFile[files.size()]);
+
     }
 
 

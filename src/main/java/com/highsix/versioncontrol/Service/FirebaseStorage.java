@@ -30,7 +30,7 @@ public class FirebaseStorage {
     @PostConstruct
     public void initialize() throws IOException {
 
-        FileInputStream serviceAccount = new FileInputStream("C:/Users/Benyamin/VersionControlBackend/serviceaccount.json");
+        FileInputStream serviceAccount = new FileInputStream(System.getProperty("user.dir")+"/serviceaccount.json");
 
         storageOptions = StorageOptions
                 .newBuilder()

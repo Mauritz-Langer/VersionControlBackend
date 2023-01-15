@@ -55,6 +55,7 @@ public class FirebaseStorage {
                 metadata.put("createdAt", time);
                 metadata.put("lastUpdatedAt", time);
                 metadata.put("versionId", String.valueOf(version.getVersionId()));
+                metadata.put("locked", "false");
 
                 Storage storage = storageOptions.getService();
 
@@ -102,7 +103,7 @@ public class FirebaseStorage {
                                 metadata.get("createdAt"),
                                 versions,
                                 1,
-                                false
+                                Boolean.getBoolean(metadata.get("locked"))
                         )
                 );
             }

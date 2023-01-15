@@ -44,23 +44,23 @@ public class StorageController {
 
 
     @PostMapping("addVersionAndUnlockFile")
-    public TextFile addVersionAndUnlockFile(@RequestBody TextFile file, @RequestParam("versionContent") String versionContent) {
-        return new TextFile();
+    public TextFile addVersionAndUnlockFile(@RequestBody TextFile file, @RequestParam String versionContent) {
+        return firebaseStorage.addVersionAndUnlockFile(file,versionContent);
     }
 
     @PostMapping("lockFile")
     public TextFile lockFile(@RequestBody TextFile file) {
-        return new TextFile();
+        return firebaseStorage.lockOrUnlockFile(file, true);
     }
 
     @PostMapping("unlockFile")
     public TextFile unlockFile(@RequestBody TextFile file) {
-        return new TextFile();
+        return firebaseStorage.lockOrUnlockFile(file, false);
     }
 
-    @PostMapping("resetFileToFormerVersion/{version}")
-    public TextFile resetFileToFormerVersion(@RequestBody TextFile file, @PathVariable("version") int versionId) {
-        return new TextFile();
+    @PostMapping("resetFileToFormerVersion/{versionId}")
+    public TextFile resetFileToFormerVersion(@RequestBody TextFile file, @PathVariable int versionId) {
+        return firebaseStorage.resetFileToFormerVersion(file, versionId);
     }
 
 }

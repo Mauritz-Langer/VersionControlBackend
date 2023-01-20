@@ -85,7 +85,7 @@ public class FirebaseStorage {
             Map<String, String> metadata = b.getMetadata();
             List<FileVersion> versions = new ArrayList<>();
             try {
-                TextFile file = files.stream().filter(e -> e.getName().split("-")[0].equals(fileName.split("-")[0])).findFirst().get();
+                TextFile file = files.stream().filter(e -> e.getName().split("€")[0].equals(fileName.split("€")[0])).findFirst().get();
                 FileVersion latestVersion = getLatestFileVersion(file);
                 file.getVersions().add(new FileVersion(latestVersion.getVersionId()+1, fileContent, metadata.get("lastUpdatedAt")));
                 file.setVersionCount(file.getVersionCount()+1);
@@ -97,7 +97,7 @@ public class FirebaseStorage {
                 ));
                 files.add(
                         new TextFile(
-                                fileName.split("-")[0],
+                                fileName.split("€")[0],
                                 metadata.get("createdAt"),
                                 versions,
                                 1,
@@ -145,7 +145,7 @@ public class FirebaseStorage {
         Storage.BlobTargetOption precondition = Storage.BlobTargetOption.generationMatch();
 
         for (Blob element : blobs.iterateAll()) {
-            if (element.getName().split("-")[0].equals(textFile.getName())) {
+            if (element.getName().split("€")[0].equals(textFile.getName())) {
                 element.toBuilder().setMetadata(updateLockMetaData).build().update(precondition);
             }
         }
@@ -165,7 +165,7 @@ public class FirebaseStorage {
         Storage.BlobTargetOption precondition = Storage.BlobTargetOption.generationMatch();
 
         for (Blob element : blobs.iterateAll()) {
-            if (element.getName().split("-")[0].equals(textFile.getName())) {
+            if (element.getName().split("€")[0].equals(textFile.getName())) {
                 element.toBuilder().setMetadata(updateLockMetaData).build().update(precondition);
             }
         }
@@ -226,7 +226,7 @@ public class FirebaseStorage {
     }
 
     private String generateFileName(TextFile textFile, FileVersion version) {
-        return Objects.requireNonNull(textFile.getName()).replace(" ", "_") + "-" + version.getVersionId();
+        return Objects.requireNonNull(textFile.getName()).replace(" ", "_") + "€" + version.getVersionId();
     }
 
 

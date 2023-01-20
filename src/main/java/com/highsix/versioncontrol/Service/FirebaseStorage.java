@@ -233,7 +233,7 @@ public class FirebaseStorage {
     private FileVersion getLatestFileVersion(TextFile textFile){
         int maxIndex = 0;
         for (int k = 0; k < textFile.getVersions().size(); k++) {
-            if (textFile.getVersions().get(k).getVersionId() > maxIndex) {
+            if (textFile.getVersions().get(k).getVersionId() > textFile.getVersions().get(maxIndex).getVersionId()) {
                 maxIndex = k;
             }
         }

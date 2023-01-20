@@ -95,14 +95,13 @@ public class FirebaseStorage {
                         fileContent,
                         metadata.get("lastUpdatedAt")
                 ));
-                String a = metadata.get("locked");
                 files.add(
                         new TextFile(
                                 fileName.split("-")[0],
                                 metadata.get("createdAt"),
                                 versions,
                                 1,
-                                Boolean.getBoolean(metadata.get("locked"))
+                                Boolean.parseBoolean(metadata.get("locked"))
                         )
                 );
             }

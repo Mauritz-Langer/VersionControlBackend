@@ -68,11 +68,8 @@ public class FirebaseStorage {
                 metadata.put("locked", "false");
                 log.debug("locked: false");
 
-                Storage storage = storageOptions.getService();
-                log.debug("Storage was initialized");
-
                 log.info("Calling 'createFileInFirebase'-Methode with file-content: " + version.getFileContent());
-                createFileInFirebase(objectName, metadata, storage, version.getFileContent());
+                createFileInFirebase(objectName, metadata, version.getFileContent());
                 log.info("Finished 'createFileInFirebase'-Methode successfully");
 
                 log.info("File uploaded to bucket " + bucketName + " as " + objectName);
@@ -86,12 +83,11 @@ public class FirebaseStorage {
 
     public TextFile[] downloadAllFiles() {
         log.debug("'downloadAllFiles'-Methode was called");
-        Storage storage = storageOptions.getService();
+
         List<TextFile> files = new ArrayList<>();
-        Bucket bucket = storage.get(bucketName);
         log.debug("Bucket was defined: "+ bucketName);
         // List all files in the directory
-        Page<Blob> blobs = bucket.list();
+        Page<Blob> blobs = getAllBlobs();
         log.debug("Blob with all entrys was created: " + blobs.getValues());
 
         for (Blob b : blobs.iterateAll()) {
@@ -152,9 +148,6 @@ public class FirebaseStorage {
 
         log.info("New Version was created");
 
-        Storage storage = storageOptions.getService();
-        Bucket bucket = storage.get(bucketName);
-
         Map<String, String> versionMetaData = new HashMap<>();
         versionMetaData.put("createdAt", textFile.getCreatedAt());
         log.debug("createAt: " + textFile.getCreatedAt());
@@ -166,47 +159,26 @@ public class FirebaseStorage {
         log.debug("locked: false");
 
         log.info("Calling 'createFileInFirebase'-Methode with file-content: " + versionContent);
-        createFileInFirebase(generateFileName(textFile, getLatestFileVersion(textFile)), versionMetaData, storage, versionContent);
+        createFileInFirebase(generateFileName(textFile, getLatestFileVersion(textFile)), versionMetaData, versionContent);
         log.info("'createFileInFirebase'-Methode was processed successfully");
-
-        Page<Blob> blobs = bucket.list();
 
         Map<String, String> updateLockMetaData = new HashMap<>();
         updateLockMetaData.put("locked", "false");
         log.info("locked: false");
 
-        Storage.BlobTargetOption precondition = Storage.BlobTargetOption.generationMatch();
-
-        for (Blob element : blobs.iterateAll()) {
-            if (element.getName().split("€")[0].equals(textFile.getName())) {
-                element.toBuilder().setMetadata(updateLockMetaData).build().update(precondition);
-            }
-        }
+        updateLockStatus(updateLockMetaData, textFile);
         log.info("Switch locked to false of the file");
 
         return textFile;
     }
 
     public TextFile lockOrUnlockFile(TextFile textFile, Boolean lock){
-        Storage storage = storageOptions.getService();
-        Bucket bucket = storage.get(bucketName);
-
-        Page<Blob> blobs = bucket.list();
-        log.debug("Blobs: " + blobs.getValues());
 
         Map<String, String> updateLockMetaData = new HashMap<>();
         updateLockMetaData.put("locked", String.valueOf(lock));
         log.debug("locked: " + lock);
 
-        Storage.BlobTargetOption precondition = Storage.BlobTargetOption.generationMatch();
-
-        for (Blob element : blobs.iterateAll()) {
-            if (element.getName().split("€")[0].equals(textFile.getName())) {
-                log.debug("Version with right name was found");
-                element.toBuilder().setMetadata(updateLockMetaData).build().update(precondition);
-                log.debug("Lock status of Version was updated");
-            }
-        }
+        updateLockStatus(updateLockMetaData, textFile);
 
         textFile.setLocked(lock);
 
@@ -234,8 +206,6 @@ public class FirebaseStorage {
 
         FileVersion latestVersion = getLatestFileVersion(textFile);
 
-        String objectName = generateFileName(textFile, latestVersion);
-
         Map<String, String> metadata = new HashMap<>();
         metadata.put("createdAt", textFile.getCreatedAt());
         log.debug("createAt: " + textFile.getCreatedAt());
@@ -246,10 +216,8 @@ public class FirebaseStorage {
         metadata.put("locked", "false");
         log.debug("locked: false");
 
-        Storage storage = storageOptions.getService();
-
         log.info("Calling 'createFileInFirebase'-Methode with file-content: " + latestVersion.getFileContent());
-        createFileInFirebase(generateFileName(textFile, getLatestFileVersion(textFile)), metadata, storage, latestVersion.getFileContent());
+        createFileInFirebase(generateFileName(textFile, getLatestFileVersion(textFile)), metadata, latestVersion.getFileContent());
         log.info("'createFileInFirebase'-Methode was processed successfully");
 
         return textFile;
@@ -258,12 +226,36 @@ public class FirebaseStorage {
 
     /*------------------------------------------------UTILS----------------------------------------------------------*/
 
-    public void createFileInFirebase(String fileName, Map<String, String> metadata, Storage storage, String content){
+    public void createFileInFirebase(String fileName, Map<String, String> metadata, String content){
+        Storage storage = storageOptions.getService();
+        log.debug("Storage was initialized");
+
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setMetadata(metadata).build();
 
         storage.create(blobInfo, content.getBytes());
         log.info("Created File in Firebase");
+    }
+
+    public void updateLockStatus(Map<String, String> updateLockMetaData, TextFile textFile) {
+        Storage storage = storageOptions.getService();
+        Bucket bucket = storage.get(bucketName);
+
+        Page<Blob> blobs = bucket.list();
+
+        Storage.BlobTargetOption precondition = Storage.BlobTargetOption.generationMatch();
+
+        for (Blob element : blobs.iterateAll()) {
+            if (element.getName().split("€")[0].equals(textFile.getName())) {
+                element.toBuilder().setMetadata(updateLockMetaData).build().update(precondition);
+            }
+        }
+    }
+
+    public Page<Blob> getAllBlobs(){
+        Storage storage = storageOptions.getService();
+        Bucket bucket = storage.get(bucketName);
+        return bucket.list();
     }
 
     private String generateFileName(TextFile textFile, FileVersion version) {

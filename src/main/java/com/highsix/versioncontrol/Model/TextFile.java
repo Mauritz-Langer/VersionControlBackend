@@ -61,4 +61,17 @@ public class TextFile {
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
+
+    public boolean like(TextFile otherTextFile){
+        if (!this.name.equals(otherTextFile.getName())) return false;
+        if (!this.createdAt.equals(otherTextFile.getCreatedAt())) return false;
+        if (this.versionCount != otherTextFile.getVersionCount()) return false;
+        if (this.locked != otherTextFile.isLocked()) return false;
+        for (FileVersion version : versions) {
+            FileVersion otherVersion = otherTextFile.getVersions().get(version.getVersionId()-1);
+            if (version.getVersionId() != otherVersion.getVersionId()) return false;
+            if (!version.getFileContent().equals(otherVersion.getFileContent())) return false;
+        }
+        return true;
+    }
 }

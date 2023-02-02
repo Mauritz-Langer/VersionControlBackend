@@ -1,7 +1,5 @@
 package com.highsix.versioncontrol.Model;
 
-import java.time.LocalDateTime;
-
 public class FileVersion {
 
     private int versionId;

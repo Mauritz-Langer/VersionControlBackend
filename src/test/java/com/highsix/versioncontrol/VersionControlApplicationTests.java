@@ -2,11 +2,6 @@ package com.highsix.versioncontrol;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.Page;
-import com.google.cloud.AsyncPageImpl;
-import com.google.cloud.PageImpl;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobInfo;
 import com.highsix.versioncontrol.Controller.StorageController;
 import com.highsix.versioncontrol.Model.TextFile;
 import com.highsix.versioncontrol.Service.FirebaseStorage;
@@ -18,14 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.xml.soap.Text;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
